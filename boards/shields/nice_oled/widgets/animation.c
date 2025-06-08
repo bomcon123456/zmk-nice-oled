@@ -19,55 +19,63 @@ const lv_img_dsc_t *crystal_imgs[] = {
     &crystal_04,
 };
 
-// --- START OF NEW BONGO CAT LOGIC ---
+// --- START OF BONGO CAT LOGIC ---
 
 #if IS_ENABLED(CONFIG_NICE_OLED_GEM_ANIMATION)
 
-// Static variables to hold the state of our interactive animation
+// These static variables are essential and remain.
 static lv_obj_t *bongo_img_widget = NULL;
 static bool left_hand_next = true;
 static lv_timer_t *return_to_idle_timer = NULL;
 
-// Callback to set the image back to the idle state
+// This callback is perfect and remains unchanged.
 static void return_to_idle_cb(lv_timer_t *timer) {
   if (bongo_img_widget) {
-    // crystal_imgs[0] is the "idle" frame
     lv_img_set_src(bongo_img_widget, crystal_imgs[0]);
   }
   lv_timer_del(return_to_idle_timer);
   return_to_idle_timer = NULL;
 }
 
-// Event callback triggered by any key press sent to the widget
-static void bongo_key_event_cb(lv_event_t *e) {
-  lv_event_code_t code = lv_event_get_code(e);
-
-  if (code == LV_EVENT_KEY) {
-    // If a "return to idle" timer is already running, delete it for
-    // responsiveness
-    if (return_to_idle_timer) {
-      lv_timer_del(return_to_idle_timer);
-      return_to_idle_timer = NULL;
-    }
-
-    // Check which hand to use and set the corresponding image
-    if (left_hand_next) {
-      // crystal_imgs[1] is the "left down" frame
-      lv_img_set_src(bongo_img_widget, crystal_imgs[1]);
-    } else {
-      // crystal_imgs[2] is the "right down" frame
-      lv_img_set_src(bongo_img_widget, crystal_imgs[2]);
-    }
-
-    // Flip the flag for the next keypress
-    left_hand_next = !left_hand_next;
-
-    // Create a new one-shot timer to return to idle after a short delay (150ms)
-    return_to_idle_timer = lv_timer_create(return_to_idle_cb, 150, NULL);
+// NEW: A helper function to trigger the animation.
+// This contains the logic that used to be in the event handler.
+void bongo_cat_trigger_anim(void) {
+  if (!bongo_img_widget) {
+    return; // Safety check
   }
+
+  if (return_to_idle_timer) {
+    lv_timer_del(return_to_idle_timer);
+    return_to_idle_timer = NULL;
+  }
+
+  if (left_hand_next) {
+    lv_img_set_src(bongo_img_widget, crystal_imgs[1]);
+  } else {
+    lv_img_set_src(bongo_img_widget, crystal_imgs[2]);
+  }
+
+  left_hand_next = !left_hand_next;
+
+  return_to_idle_timer = lv_timer_create(return_to_idle_cb, 150, NULL);
 }
 
+// NEW: The ZMK event listener function.
+int bongo_cat_zmk_event_listener(const zmk_event_t *eh) {
+  // Check if the event is a key press event.
+  if (as_zmk_key_press(eh)) {
+    bongo_cat_trigger_anim();
+  }
+  return ZMK_EV_EVENT_BUBBLE; // Allow other listeners to process the event
+}
+
+// NEW: Register our listener with the ZMK event manager.
+ZMK_LISTENER(bongo_cat_listener, bongo_cat_zmk_event_listener);
+// NEW: Subscribe our listener to the key press event source.
+ZMK_SUBSCRIPTION(bongo_cat_listener, zmk_key_press);
+
 #endif // IS_ENABLED(CONFIG_NICE_OLED_GEM_ANIMATION)
+// --- END OF BONGO CAT LOGIC ---
 
 // CONFIG_NICE_OLED_POKEMON_ANIMATION
 // 01 to 20
@@ -118,31 +126,11 @@ void draw_animation(lv_obj_t *canvas, struct zmk_widget_screen *widget) {
   lv_obj_t *art2 = NULL;
 
 #if IS_ENABLED(CONFIG_NICE_OLED_GEM_ANIMATION)
-  // --- MODIFIED SECTION FOR BONGO CAT ---
-  // Instead of animimg, create a simple image widget
+  // --- HEAVILY SIMPLIFIED DRAW FUNCTION ---
+  // Its ONLY job is to create the image widget and set the initial idle frame.
   art = lv_img_create(widget->obj);
-  bongo_img_widget = art; // Store the widget pointer globally
-
-  // Set the initial image to the idle frame (crystal_imgs[0])
-  lv_img_set_src(art, crystal_imgs[0]);
-
-  // Setup input group to capture key events on the main widget
-  lv_group_t *g = lv_group_create();
-  lv_group_set_default(g);
-
-  lv_indev_t *indev_keypad = lv_indev_get_next(NULL);
-  while (indev_keypad) {
-    if (lv_indev_get_type(indev_keypad) == LV_INDEV_TYPE_KEYPAD) {
-      lv_indev_set_group(indev_keypad, g);
-      break;
-    }
-    indev_keypad = lv_indev_get_next(indev_keypad);
-  }
-
-  // Add the event callback to the main widget object
-  lv_obj_add_event_cb(widget->obj, bongo_key_event_cb, LV_EVENT_KEY, NULL);
-  lv_group_add_obj(g, widget->obj);
-  // --- END OF MODIFIED SECTION ---
+  bongo_img_widget = art; // Save the pointer so our listener can use it.
+  lv_img_set_src(art, crystal_imgs[0]); // Set idle frame.
 
 #elif IS_ENABLED(CONFIG_NICE_OLED_POKEMON_ANIMATION)
   /* If we have the Pokémon animation enabled */
