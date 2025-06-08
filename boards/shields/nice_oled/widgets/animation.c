@@ -3,8 +3,12 @@
 // TODO: (Feature request) Disable animation when on battery #4
 // #include "../assets/custom_fonts.h"
 // #include "battery.h"
+#include "zmk/event_manager.h"
+#include "zmk/events/key_press.h"
 #include <stdlib.h>
+#include <zephyr/device.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 
 // CONFIG_NICE_OLED_GEM_ANIMATION
 LV_IMG_DECLARE(crystal_01);
