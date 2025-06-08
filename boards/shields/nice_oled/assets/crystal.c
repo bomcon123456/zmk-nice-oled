@@ -66,7 +66,7 @@ const lv_img_dsc_t crystal_01 = {
     .header.reserved = 0,
     .header.w = 60,
     .header.h = 60,
-    .data_size = 480,
+    .data_size = 488,
     .data = crystal_01_map,
 };
 
@@ -132,7 +132,7 @@ const lv_img_dsc_t crystal_02 = {
     .header.reserved = 0,
     .header.w = 60,
     .header.h = 60,
-    .data_size = 480,
+    .data_size = 488,
 
     .data = crystal_02_map,
 };
@@ -199,7 +199,7 @@ const lv_img_dsc_t crystal_03 = {
     .header.reserved = 0,
     .header.w = 60,
     .header.h = 60,
-    .data_size = 480,
+    .data_size = 488,
     .data = crystal_03_map,
 };
 
@@ -257,7 +257,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-
 };
 
 const lv_img_dsc_t crystal_04 = {
@@ -266,6 +265,6 @@ const lv_img_dsc_t crystal_04 = {
     .header.reserved = 0,
     .header.w = 60,
     .header.h = 60,
-    .data_size = 480,
+    .data_size = 488,
     .data = crystal_04_map,
 };
